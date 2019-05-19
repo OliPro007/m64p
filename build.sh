@@ -156,6 +156,8 @@ else
   fi
 fi
 
+zip -r mupen64plus-GLideN64-$my_os.zip mupen64plus
+
 # if [[ $1 == "aws" ]]; then
   # rm $base_dir/*.zip
   # DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
