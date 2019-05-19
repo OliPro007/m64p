@@ -14,10 +14,6 @@ else
   suffix=".so"
 fi
 
-#if [[ $HOST_CPU == "i686" ]]; then
-#  export NEW_DYNAREC=1
-#fi
-
 install_dir=$PWD/mupen64plus
 mkdir -p $install_dir
 base_dir=$PWD
@@ -161,10 +157,3 @@ else
 fi
 
 zip -r mupen64plus-GLideN64-$my_os.zip mupen64plus
-
-# if [[ $1 == "aws" ]]; then
-  # rm $base_dir/*.zip
-  # DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
-  # zip -r mupen64plus-GLideN64-$my_os.zip mupen64plus
-  # aws s3 cp mupen64plus-GLideN64-*.zip s3://m64p/m64p/ --acl public-read
-# fi
