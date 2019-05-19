@@ -125,6 +125,7 @@ if [[ $UNAME == *"MINGW"* ]]; then
   cp /$mingw_prefix/bin/libpcre2-16-0.dll $install_dir
   cp /$mingw_prefix/bin/Qt5Core.dll $install_dir
   cp /$mingw_prefix/bin/Qt5Gui.dll $install_dir
+  cp /$mingw_prefix/bin/Qt5Svg.dll $install_dir
   cp /$mingw_prefix/bin/Qt5Widgets.dll $install_dir
   cp $base_dir/7za.exe $install_dir
 elif [[ $UNAME == "Darwin" ]]; then
