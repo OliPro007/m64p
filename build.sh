@@ -76,6 +76,8 @@ cd $base_dir/GLideN64/projects/cmake
 sed -i 's/GLideNUI\/build\/debug\/libGLideNUI.a/GLideNUI\/build\/release\/libGLideNUI.a/g' ../../src/CMakeLists.txt
 if [[ $UNAME == *"MINGW"* ]]; then
   sed -i 's/check_ipo_supported(RESULT result)//g' ../../src/CMakeLists.txt
+  # Workaround a MSYS2 packaging issue for Qt5 (see https://github.com/msys2/MINGW-packages/issues/5253)
+  sed -i -e 's/C:\/building\/msys32/C:\/msys64/g' /$mingw_prefix/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake
   cmake -G "MSYS Makefiles" -DVEC4_OPT=On -DCRC_OPT=On -DMUPENPLUSAPI=On ../../src/
 else
   rm -rf ../../src/GLideNHQ/inc
