@@ -9,8 +9,7 @@ environment:
       myarch: x86_64
 
 artifacts:
-  -path: mupen64plus-GLideN64-*.zip
-   name: m64p
+  - path: mupen64plus-GLideN64-*.zip
 
 build_script:
 - del C:\Windows\System32\libssl-*.dll C:\Windows\system32\libcrypto-*.dll
