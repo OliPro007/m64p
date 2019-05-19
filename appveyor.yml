@@ -9,7 +9,7 @@ environment:
       myarch: x86_64
 
 cache:
-  - "C:\msys64\var\cache\pacman\pkg"
+  - C:\msys64\var\cache\pacman\pkg
 
 artifacts:
   - path: mupen64plus-GLideN64-*.zip
