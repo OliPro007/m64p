@@ -15,7 +15,7 @@ else
 fi
 
 #if [[ $HOST_CPU == "i686" ]]; then
-  export NEW_DYNAREC=1
+#  export NEW_DYNAREC=1
 #fi
 
 install_dir=$PWD/mupen64plus
@@ -130,6 +130,10 @@ if [[ $UNAME == *"MINGW"* ]]; then
   cp /$mingw_prefix/bin/Qt5Svg.dll $install_dir
   cp /$mingw_prefix/bin/Qt5Widgets.dll $install_dir
   cp $base_dir/7za.exe $install_dir
+  
+  cd $install_dir
+  windeployqt ./mupen64plus-gui.exe
+  cd $base_dir
 elif [[ $UNAME == "Darwin" ]]; then
   my_os=macos
 
