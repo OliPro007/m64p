@@ -32,3 +32,5 @@ build_script:
     cd %APPVEYOR_BUILD_FOLDER%
 
     bash -c "./build.sh"
+
+test: off
