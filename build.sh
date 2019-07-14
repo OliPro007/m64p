@@ -19,36 +19,36 @@ mkdir -p $install_dir
 base_dir=$PWD
 
 cd $base_dir/mupen64plus-core/projects/unix
-make -j4 all NEW_DYNAREC=1
+make -j$(nproc) all NEW_DYNAREC=1
 cp -P $base_dir/mupen64plus-core/projects/unix/*$suffix* $install_dir
 cp $base_dir/mupen64plus-core/data/* $install_dir
 
 cd $base_dir/mupen64plus-rsp-hle/projects/unix
-make -j4 all
+make -j$(nproc) all
 cp $base_dir/mupen64plus-rsp-hle/projects/unix/*$suffix $install_dir
 
 cd $base_dir/mupen64plus-input-sdl/projects/unix
-make -j4 all
+make -j$(nproc) all
 cp $base_dir/mupen64plus-input-sdl/projects/unix/*$suffix $install_dir
 cp $base_dir/mupen64plus-input-sdl/data/* $install_dir
 
 cd $base_dir/mupen64plus-audio-sdl2/projects/unix
-make -j4 all
+make -j$(nproc) all
 cp $base_dir/mupen64plus-audio-sdl2/projects/unix/*$suffix $install_dir
 
 mkdir -p $base_dir/mupen64plus-gui/build
 cd $base_dir/mupen64plus-gui/build
 if [[ $UNAME == *"MINGW"* ]]; then
   qmake ../mupen64plus-gui.pro
-  make -j4 release
+  make -j$(nproc) release
   cp $base_dir/mupen64plus-gui/build/release/mupen64plus-gui.exe $install_dir
 elif [[ $UNAME == "Darwin" ]]; then
   /usr/local/Cellar/qt5/*/bin/qmake ../mupen64plus-gui.pro
-  make -j4
+  make -j$(nproc)
   cp -Rp $base_dir/mupen64plus-gui/build/mupen64plus-gui.app $install_dir
 else
   qmake ../mupen64plus-gui.pro
-  make -j4
+  make -j$(nproc)
   cp $base_dir/mupen64plus-gui/build/mupen64plus-gui $install_dir
 fi
 
@@ -59,13 +59,13 @@ mkdir -p $base_dir/GLideN64/src/GLideNUI/build
 cd $base_dir/GLideN64/src/GLideNUI/build
 if [[ $UNAME == *"MINGW"* ]]; then
   qmake ../GLideNUI.pro
-  make -j4 release
+  make -j$(nproc) release
 elif [[ $UNAME == "Darwin" ]]; then
   /usr/local/Cellar/qt5/*/bin/qmake ../GLideNUI.pro
-  make -j4
+  make -j$(nproc)
 else
   qmake ../GLideNUI.pro
-  make -j4
+  make -j$(nproc)
 fi
 
 cd $base_dir/GLideN64/projects/cmake
@@ -79,7 +79,7 @@ else
   rm -rf ../../src/GLideNHQ/inc
   cmake -DUSE_SYSTEM_LIBS=On -DVEC4_OPT=On -DCRC_OPT=On -DMUPENPLUSAPI=On ../../src/
 fi
-make -j4
+make -j$(nproc)
 
 if [[ $UNAME == *"MINGW"* ]]; then
   cp mupen64plus-video-GLideN64$suffix $install_dir
@@ -95,36 +95,27 @@ strip $install_dir/*$suffix
 if [[ $UNAME == *"MINGW"* ]]; then
   if [[ $UNAME == *"MINGW64"* ]]; then
     my_os=win64
-    cp /$mingw_prefix/bin/libgcc_s_seh-1.dll $install_dir
   else
     my_os=win32
-    cp /$mingw_prefix/bin/libgcc_s_dw2-1.dll $install_dir
   fi
-  cp /$mingw_prefix/bin/libwinpthread-1.dll $install_dir
-  cp /$mingw_prefix/bin/SDL2.dll $install_dir
-  cp /$mingw_prefix/bin/libpng16-16.dll $install_dir
-  cp /$mingw_prefix/bin/libglib-2.0-0.dll $install_dir
-  cp /$mingw_prefix/bin/libstdc++-6.dll $install_dir
-  cp /$mingw_prefix/bin/zlib1.dll $install_dir
-  cp /$mingw_prefix/bin/libintl-8.dll $install_dir
-  cp /$mingw_prefix/bin/libpcre-1.dll $install_dir
-  cp /$mingw_prefix/bin/libiconv-2.dll $install_dir
-  cp /$mingw_prefix/bin/libharfbuzz-0.dll $install_dir
-  cp /$mingw_prefix/bin/libgraphite2.dll $install_dir
-  cp /$mingw_prefix/bin/libfreetype-6.dll $install_dir
-  cp /$mingw_prefix/bin/libbz2-1.dll $install_dir
-  cp /$mingw_prefix/bin/libminizip-1.dll $install_dir
-  cp /$mingw_prefix/bin/libsamplerate-0.dll $install_dir
-  cp /$mingw_prefix/bin/libjasper-4.dll $install_dir
-  cp /$mingw_prefix/bin/libjpeg-8.dll $install_dir
-  cp /$mingw_prefix/bin/libicudt64.dll $install_dir
-  cp /$mingw_prefix/bin/libicuin64.dll $install_dir
-  cp /$mingw_prefix/bin/libicuuc64.dll $install_dir
-  cp /$mingw_prefix/bin/libpcre2-16-0.dll $install_dir
-  cp /$mingw_prefix/bin/Qt5Core.dll $install_dir
-  cp /$mingw_prefix/bin/Qt5Gui.dll $install_dir
-  cp /$mingw_prefix/bin/Qt5Svg.dll $install_dir
-  cp /$mingw_prefix/bin/Qt5Widgets.dll $install_dir
+  
+  copyDlls(){
+	local dlls=`objdump.exe -p $1 | grep 'DLL Name:' | sed -e "s/\t*DLL Name: //g"`
+	while read -r filename; do
+	  local dependency="/$mingw_prefix/bin/$filename"
+	  if [ -f $dependency ] && [ ! -f "$install_dir/$filename" ]; then
+		cp $dependency $install_dir
+		echo "Copied $dependency"
+		copyDlls $dependency
+	  fi
+	done <<< "$dlls"
+  }
+  
+  while read -r bin; do
+    echo "Dependencies for $bin"
+    copyDlls "$bin"
+  done <<< "$(ls $install_dir/*.{dll,exe})"
+  
   cp $base_dir/7za.exe $install_dir
   
   cd $install_dir
