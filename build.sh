@@ -121,6 +121,11 @@ if [[ $UNAME == *"MINGW"* ]]; then
   cd $install_dir
   windeployqt ./mupen64plus-gui.exe
   cd $base_dir
+  
+  while read -r bin; do
+    echo "Dependencies for $bin"
+    copyDlls "$bin"
+  done <<< "$(ls $install_dir/**/*.{dll,exe})"
 elif [[ $UNAME == "Darwin" ]]; then
   my_os=macos
 
